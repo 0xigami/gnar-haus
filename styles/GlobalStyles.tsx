@@ -66,7 +66,6 @@ export default function GlobalStyles() {
         }
 
         body * {
-          overflow-x: hidden;
           font-family: 'Londrina Solid', cursive;
         }
 
@@ -75,10 +74,16 @@ export default function GlobalStyles() {
           position: relative;
           min-height: calc(100vh - (var(--header-height) + var(--footer-height)));
         }
-
+        .list-header {
+          @media screen and (max-width: ${returnBreakpoint('tablet')}) {
+            h2 {
+              font-size: 20px !important;
+            }
+          }
+        }
         header,
         footer {
-          font-size: 41px;
+          font-size: 20px;
           width: 100%;
           display: flex;
           justify-content: space-between;
@@ -101,10 +106,13 @@ export default function GlobalStyles() {
           font-weight: 500;
         }
         h1 {
-          font-size: 41px;
+          font-size: 60px;
           line-height: 1;
           text-align: center;
           padding: var(--space-md) 0 var(--space-lg);
+          @media screen and (max-width: ${returnBreakpoint('tablet')}) {
+            font-size: 40px !important;
+          }
         }
         h2 {
           font-size: 31px;
@@ -135,29 +143,63 @@ export default function GlobalStyles() {
         /* ZORA SPECIFIC -- CLEAN UP
            - WALLET MODAL
         */
+        .owned-list>.zora-cardOuter {
+          background: #feefd5;
+          border: 0px;
+        }
+        .owned-list>div>div>div>.zora-cardItemInfo {
+          background: white;
+        }
+        .zora--auction-house-modalInner>.zora-cardOuter {
+          border: 0px;
+          margin: 0px;
+        }
+        .zora-wallet-modalText>.error>br {
+          display: none;
+        }
+        .list-component-wrapper>button {
+          padding: 0px 20px;
+          margin-bottom: 5px;
+        }
+        .owned-list-item {
+          cursor: pointer;
+          border: 2px solid black !important;
+          border-radius: 0px !important;
+          margin: 15px;
+          font-weight: bold;
+          box-shadow: 5px 5px rgb(0 0 0 / 50%);
+          &:hover {
+            box-shadow: 5px 5px pink;
+            border: 2px solid pink !important;
+          }
+        }
+        .zora-cardMediaWrapper {
+          width: auto !important;
+        }
         .zora-wallet-modalContent {
           h3 {
-            font-size: 41px;
-            padding: 0 0 15px;
+            font-size: 18px;
+            padding: 0px;
           }
           .zora--auction-house-modalSuccessMessage {
-            font-size: 41px;
+            font-size: 20px;
           }
           img {
             object-fit: contain;
           }
           p {
-            font-size: 41px;
+            font-size: 18px;
             font-family: 'Londrina Solid', cursive;
-            padding: 0 0 10px;
+            padding: 0 40px 0px;
+            margin-bottom: 0px;
             &:last-of-type {
-              padding-bottom: 30px!important;
+              padding-bottom: 5px!important;
             }
           }
           .zora--auction-house-ethAmountLabel {
             font-family: 'Londrina Solid', cursive;
             padding-bottom: 15px;
-            font-size: 41px;
+            font-size: 20px;
           }
           input {
             margin-bottom: 15px;

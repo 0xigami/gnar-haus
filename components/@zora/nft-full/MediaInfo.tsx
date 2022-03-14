@@ -4,12 +4,15 @@ import { NFTDataContext } from "../context/NFTDataContext";
 import { AddressView } from "../components/AddressView";
 import { useMediaContext } from "../context/useMediaContext";
 import type { StyleProps } from "../utils/StyleTypes";
+import { NFTTraits } from "./NFTTraits";
+import { id } from "ethers/lib/utils";
 
 type MediaInfoProps = {
   a11yIdPrefix?: string;
+  id: string;
 } & StyleProps;
 
-export const MediaInfo = ({ a11yIdPrefix, className }: MediaInfoProps) => {
+export const MediaInfo = ({ a11yIdPrefix, id, className }: MediaInfoProps) => {
   const { getStyles, getString, style } = useMediaContext();
   const {
     nft: { data },
@@ -39,6 +42,9 @@ export const MediaInfo = ({ a11yIdPrefix, className }: MediaInfoProps) => {
   return (
     <div {...getStyles("fullItemInfo", className)}>
       <h2 {...getStyles("fullTitle")}>{title}</h2>
+      <div className="">
+        <NFTTraits id={id}/>
+      </div>
       <div id={`${a11yIdPrefix}description`} {...getStyles("fullDescription")}>
         {description}
       </div>

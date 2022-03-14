@@ -9,7 +9,6 @@ const Posts = ({ posts, loading } : {posts: any[], loading: boolean} ) => {
     if (loading) {
         return <h2>Loading...</h2>;
     }
-
   return (
 
     <div css={css`
@@ -35,8 +34,8 @@ const Posts = ({ posts, loading } : {posts: any[], loading: boolean} ) => {
                 <NFTPreview
                   css={css`
                     background: #ffffff;
-                    min-height: 350px;
-                    min-width: 300px;
+                    min-height: 250px;
+                    min-width: 200px;
                     margin-right: 20px;
                     cursor: pointer;
                     -webkit-perspective: 600px;

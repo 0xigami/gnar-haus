@@ -1,4 +1,7 @@
 import styled from "@emotion/styled";
+import { useEthers } from '@usedapp/core';
+import WalletConnectModal from '../components/WalletConnectModal';
+import React from "react";
 import {
   AuctionManager,
   useManageAuction,
@@ -9,21 +12,41 @@ import {
   PreviewComponents,
 } from "@zoralabs/nft-components";
 import { FetchStaticData } from "@zoralabs/nft-hooks";
-import {
-  useWalletButton,
-  useWeb3Wallet,
-} from "@zoralabs/simple-wallet-provider";
 import { Fragment, useContext } from "react";
 import useSWR from "swr";
 import Head from "../components/head";
 import { PageWrapper } from "./../styles/components";
 import { NavLink } from '../components/NavLink'
 import { css } from '@emotion/react'
+import PureModal from 'react-pure-modal';
+import Notify from 'simple-notify'
+import 'simple-notify/dist/simple-notify.min.css'
+import 'react-pure-modal/dist/react-pure-modal.min.css';
+
+function pushNotify() {
+  new Notify({
+    status: 'error',
+    title: 'Wallet Net',
+    text: 'Please change to MainNet',
+    effect: 'fade',
+    speed: 300,
+    showIcon: true,
+    showCloseButton: true,
+    autoclose: true,
+    autotimeout: 3000,
+    gap: 20,
+    distance: 20,
+    type: 1,
+    position: 'right top'
+  })
+}
 
 const ListItemComponent = () => {
   const {
     nft: { data },
   } = useContext(NFTDataContext);
+
+  const { chainId, account } = useEthers();
 
   const { openManageAuction, openListAuction } = useManageAuction();
 
@@ -40,7 +63,7 @@ const ListItemComponent = () => {
         className="button"
         onClick={() => {
           const reserveId = data.pricing.reserve?.id;
-          if (reserveId) {
+          if (reserveId && chainId == 1) {
             openManageAuction(parseInt(reserveId, 10));
           }
         }}
@@ -51,33 +74,21 @@ const ListItemComponent = () => {
   }
 
   return (
+    
     <button
       onClick={() => {
-        openListAuction(data.nft.contract.address, data.nft.tokenId);
+        if(chainId === 1 && account)
+          openListAuction(data.nft.contract.address, data.nft.tokenId);
+        else
+          pushNotify();
       }}
       className="button"
     >
       List
     </button>
+     
   );
-};
-
-const ConnectWallet = () => {
-  const { buttonAction, actionText, connectedInfo } = useWalletButton();
-
-  return (
-    <div>
-      <h1>{`${
-        connectedInfo === undefined
-          ? "To List your NFT Connect your wallet!"
-          : connectedInfo
-      }`}</h1>
-      <button className="button" onClick={() => buttonAction()}>
-        {actionText}
-      </button>
-    </div>
-  );
-};
+}; 
 
 const RenderOwnedList = ({ account }: { account: string }) => {
   const { data, error } = useSWR(
@@ -96,7 +107,7 @@ const RenderOwnedList = ({ account }: { account: string }) => {
 
   if (data.tokens.length === 0) {
     return (
-      <div className="owned-list-no-tokens">
+      <div className="owned-list-no-tokens py-special">
         <h2>We couldn’t find any NFTs you own 😢</h2>
         <p>Make sure you’ve connected the correct wallet</p>
       </div>
@@ -115,7 +126,7 @@ const RenderOwnedList = ({ account }: { account: string }) => {
       >
         <div className="owned-list-item">
           <PreviewComponents.MediaThumbnail />
-          <div className="list-component-wrapper">
+          <div className="list-component-wrapper" css={{background: "white"}}>
             <ListItemComponent />
           </div>
         </div>
@@ -149,10 +160,16 @@ const MediaThumbnailPreview = ({
 };
 
 export default function List() {
-  const { buttonAction, actionText, connectedInfo } = useWalletButton();
-  const { active, account } = useWeb3Wallet();
+  const { deactivate, account, chainId } = useEthers();
+  const [modal, setModal] = React.useState(false);
+
   return (
     <>
+      <style jsx global>{`
+        ${chainId !== 1 && "div>"}.zora-wallet-dialogOverlay {
+          display: none !important
+        }
+      `}</style>
       <Head title="List" />
       <AuctionManager
         renderMedia={MediaThumbnailPreview}
@@ -161,7 +178,26 @@ export default function List() {
           LIST_MEDIA_DESCRIPTION: `Set the reserve price to list your NFT on ${process.env.NEXT_PUBLIC_APP_TITLE}`,
         }}
       >
-        <div css={{padding: '20px', display: "flex", flexWrap: "wrap", justifyContent: "space-between" }}>
+      {
+        !account &&
+        <PureModal
+          header={<div>Connect Your Wallet</div>}
+          css={{
+            minWidth: "250px"
+          }}
+          width="35%"
+          isOpen={modal}
+          closeButton="X"
+          closeButtonPosition="header"
+          onClose={() => {
+            setModal(false);
+            return true;
+          }}
+        >
+          <WalletConnectModal onDismiss={() => {}}/>
+        </PureModal>
+      }
+      <div className="list-header" css={{padding: '20px', display: "flex", flexWrap: "wrap", justifyContent: "space-between" }}>
       <NavLink passHref href="/">
         <h2
         css={css`
@@ -170,14 +206,17 @@ export default function List() {
       `}>Home</h2>
       </NavLink>
       {
-            active ?
+            account ?
             <div>
             <button 
               css={css`
                 border: none;
                 cursor: pointer;
               `}
-              onClick={() => buttonAction()}>
+              onClick={async () => {
+                await deactivate();
+                setModal(false);
+              }}>
               <h2
                 css={css`
                 border: none;
@@ -192,18 +231,33 @@ export default function List() {
                 border: none;
                 cursor: pointer;
               `}
-              onClick={() => buttonAction()}>
+              onClick={() => setModal(true)}>
               <h2>Connect Wallet</h2>
             </button>
           </div>
       }
      </div>
         <ListWrapper>
-          <ConnectWallet />
-          {account &&
+          <div>
+            <h1>{`${
+              !account
+                ? "To List your NFT Connect your wallet!"
+                : `Connected to ${ account && [account.substr(0, 4), account.substr(38, 4)].join('...')}`
+            }`}</h1>
+            <button className="button" onClick={() => { 
+                !account ? setModal(true) : deactivate()
+              }}>
+              {
+                account ? "Disconnect Wallet" : "Connect Wallet"
+              }
+            </button>
+          </div>
+          {account ?
             <div className="owned-list">
               <RenderOwnedList account={account} />
             </div>
+            :
+            <div className="py-special2"></div>
           }
         </ListWrapper>
       </AuctionManager>
@@ -222,6 +276,14 @@ const ListWrapper = styled(PageWrapper)`
   .owned-list-no-tokens {
     text-align: center;
     padding-top: var(--space-sm);
+  }
+  .py-special { 
+    padding-top: 60px;
+    padding-bottom: 150px;
+  }
+  .py-special2 { 
+    padding-top: 60px;
+    padding-bottom: 280px;
   }
   .list-component-wrapper {
     padding: var(--base-unit) 0;

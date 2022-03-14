@@ -5,17 +5,17 @@ import {
   useWeb3Wallet,
 } from "@zoralabs/simple-wallet-provider";
 import { useRouter } from 'next/router';
+import { useMediaContext } from "./@zora/context/useMediaContext";
 
 export const Header = () => {
   const { asPath, pathname } = useRouter();
   const { buttonAction, actionText, connectedInfo, active  } = useWalletButton();
-
-  console.log(asPath);
+  const { getStyles } = useMediaContext();
 
   if(asPath === "/teken/"){
     return (
       <>
-        <header css={css`
+        <header {...getStyles("pageHeader")} css={css`
           height: var(--header-height);
           top: 0;
           z-index: var(--header-z);
@@ -60,7 +60,7 @@ export const Header = () => {
   }else{
     return (
       <>
-        <header css={css`
+        <header {...getStyles("pageHeader")} css={css`
           height: var(--header-height);
           top: 0;
           z-index: var(--header-z);
