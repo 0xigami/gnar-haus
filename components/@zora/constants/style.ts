@@ -1,4 +1,5 @@
 import { css } from "@emotion/css";
+import { returnBreakpoint } from '../../../styles/breakpoints'
 
 import {
   SVG_FULLSCREEN,
@@ -94,6 +95,13 @@ export const Style = {
       padding: ${theme.textBlockPadding};
       ${theme.titleFont}
     `,
+    pageHeader: (theme: ThemeOptionsType) => css`
+      @media screen and (max-width: ${returnBreakpoint('tablet')}) {
+        h2 {
+          font-size: 20px !important
+        }
+      }
+    `,
     cardMediaWrapper: (theme: ThemeOptionsType) => css`
       width: ${theme.previewCard.width};
       height: ${theme.previewCard.height};
@@ -106,6 +114,36 @@ export const Style = {
     cardItemInfo: (theme: ThemeOptionsType) => css`
       font-family: 'Londrina Solid', cursive;
       padding: ${theme.textBlockPadding};
+      @media screen and (max-width: ${returnBreakpoint('tablet')}) {
+        font-size: 20px;
+      }
+    `,
+    footerTopBorder: (theme: ThemeOptionsType) => css`
+      background: #feefd5;
+      border-top: solid;
+      padding: 20px 60px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 22px;
+      @media screen and (max-width: ${returnBreakpoint('tablet')}) {
+        padding: 20px 20px;
+      }
+
+    `,
+    pureModal: (theme: ThemeOptionsType) => css`
+      display: flex;
+      justify-content: center;
+      @media screen and (max-width: ${returnBreakpoint('tablet')}) {
+        display: grid;
+        font-szie: 10px;
+      }
+    `,
+    removeOverflow: (theme: ThemeOptionsType) => css`
+      overflow-x: hidden;
+      overflow-y: hidden;
+      @media screen and (max-width: ${returnBreakpoint('tablet')}) {
+        font-size:20px;
+      }
     `,
     cardAuctionPricing: (
       theme: ThemeOptionsType,
@@ -136,6 +174,11 @@ export const Style = {
         grid-auto-flow: column;
         grid-template-rows: auto auto;
         grid-auto-columns: 1fr;
+        @media screen and (max-width: ${returnBreakpoint('tablet')}) {
+          div {
+            font-size: 18px;
+          }
+        }
         padding: ${theme.textBlockPadding};
         ${getActiveStyle()};
       `;
@@ -147,6 +190,9 @@ export const Style = {
       font-family: 'Londrina Solid', cursive;
       text-overflow: ellipsis;
       white-space: nowrap;
+      @media screen and (max-width: ${returnBreakpoint('tablet')}) {
+        font-size: 25px;
+      }
     `,
     // Styles for full-page view
     fullPage: (theme: ThemeOptionsType) => theme.bodyFont,
@@ -158,7 +204,7 @@ export const Style = {
     fullTitle: (theme: ThemeOptionsType) => css`
       font-weight: inherit;
       font-size: 21px;
-      margin: ${theme.spacingUnit} 0;
+      //margin: ${theme.spacingUnit} 0;
     `,
     fullDescription: (theme: ThemeOptionsType) => css`
     font-size: 21px;

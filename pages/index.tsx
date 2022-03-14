@@ -1,8 +1,8 @@
+import React from 'react';
 import styled from "@emotion/styled";
 import Head from "../components/head";
 import { PageWrapper } from "../styles/components";
 import { GetStaticProps } from "next";
-
 import { AuctionsList } from "../components/AuctionsList";
 
 import {
@@ -14,8 +14,8 @@ import {
 export default function Home({ tokens }: { tokens: any }) {
   return (
     <IndexWrapper>
-      <Head />
-      <AuctionsList tokens={tokens} />
+        <Head />
+        <AuctionsList tokens={tokens} />
     </IndexWrapper>
   );
 }
@@ -29,7 +29,7 @@ export const getStaticProps: GetStaticProps = async () => {
   const tokens = await FetchStaticData.fetchZoraIndexerList(fetchAgent, {
     curatorAddress: process.env.NEXT_PUBLIC_CURATORS_ID as any,
     collectionAddresses: contractAddress ? contractAddress.split(',') : undefined,
-    limit: 100,
+    limit: 10000,
     offset: 0,
   });
 

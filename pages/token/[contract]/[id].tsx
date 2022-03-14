@@ -11,10 +11,13 @@ import { NETWORK_ID, APP_TITLE } from './../../../utils/env-vars'
 import { PageWrapper } from "../../../styles/components";
 import Head from "../../../components/head";
 import { NavLink } from './../../../components/NavLink'
-import {
-  useWalletButton,
-} from "@zoralabs/simple-wallet-provider";
+import React from "react";
 import { css } from '@emotion/react'
+import PureModal from 'react-pure-modal';
+import WalletConnectModal from '../../../components/WalletConnectModal';
+import 'react-pure-modal/dist/react-pure-modal.min.css';
+import { useEthers } from '@usedapp/core';
+import { useMediaContext } from "../../../components/@zora/context/useMediaContext";
 
 const styles = {
   theme: {
@@ -37,10 +40,31 @@ export default function Piece({
   initialData,
 }: PieceProps) {
   const { query } = useRouter();
-  const { buttonAction, actionText, connectedInfo, active  } = useWalletButton();
+  const [modal, setModal] = React.useState(false);
+  const { deactivate, account } = useEthers();
+  const { getStyles } = useMediaContext();
 
   return (
     <>
+      {
+        !account &&
+        <PureModal
+          header={<div>Connect Your Wallet</div>}
+          width="35%"
+          css={{
+            minWidth: "250px"
+          }}
+          isOpen={modal}
+          closeButton="X"
+          closeButtonPosition="header"
+          onClose={() => {
+            setModal(false);
+            return true;
+          }}
+        >
+          <WalletConnectModal onDismiss={() => {}}/>
+        </PureModal>
+      }
       <Head
         title={`${name} | ${APP_TITLE}`}
         description={description}
@@ -50,7 +74,7 @@ export default function Piece({
         networkId={NETWORK_ID as NetworkIDs}
         style={styles}
       >
-        <div css={{ padding: '20px', display: "flex", flexWrap: "wrap", justifyContent: "space-between" }}>
+      <div {...getStyles("pageHeader")} css={{ padding: '20px', display: "flex", flexWrap: "wrap", justifyContent: "space-between" }}>
       <NavLink passHref href="/">
         <h2
         css={css`
@@ -58,35 +82,34 @@ export default function Piece({
         cursor: pointer;
       `}>Home</h2>
       </NavLink>
-      {
-            active ?
+        {
+          account ?
             <div>
-            <button 
-              css={css`
-                border: none;
-                cursor: pointer;
-              `}
-              onClick={() => buttonAction()}>
-              <h2
+              <button 
                 css={css`
-                border: none;
-                cursor: pointer;
-              `}>Disconect Wallet</h2>
-            </button>
-          </div>
+                  border: none;
+                  cursor: pointer;
+                `}
+                onClick={async () => {
+                  await deactivate();
+                  setModal(false);
+                }}>
+                <h2>Disconect Wallet</h2>
+              </button>
+            </div>
             :
             <div>
-            <button 
-              css={css`
-                border: none;
-                cursor: pointer;
-              `}
-              onClick={() => buttonAction()}>
-              <h2>Connect Wallet</h2>
-            </button>
-          </div>
-      }
-     </div>
+              <button 
+                css={css`
+                  border: none;
+                  cursor: pointer;
+                `}
+                onClick={() =>setModal(true)}>
+                <h2>Connect Wallet</h2>
+              </button>
+            </div>
+        }
+      </div>
         <PageWrapper>
           <NFTFullPage
             useBetaIndexer={true}

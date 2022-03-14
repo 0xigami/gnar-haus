@@ -4,7 +4,8 @@ import { useMediaContext } from "../context/useMediaContext";
 import { NFTDataContext } from "../context/NFTDataContext";
 import { defaultGetContentData, GetContentDataType, } from "../utils/getContentDataOptions";
 import type { StyleProps } from "../utils/StyleTypes";
-import { Global, css } from '@emotion/react'
+import { Global, css } from '@emotion/react';
+import Image from 'next/image';
 
 const styles = css`
     @font-face {
@@ -43,7 +44,7 @@ export const MediaThumbnail = ({
   return (
     <div>
       <Global styles={styles} />
-      <img src={_image}/>
+      <Image src={_image} width={180} height={200} layout='responsive' />
       <div {...getStyles("cardItemInfo")}>
         <h2 {...getStyles("cardTitle")}>{title}</h2>
       </div>
