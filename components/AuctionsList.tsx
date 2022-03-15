@@ -69,14 +69,14 @@ export const AuctionsList = ({ tokens }: { tokens: any[] }) => {
   const { deactivate, account } = useEthers();
   const { getStyles } = useMediaContext();
 
-  React.useEffect(() => {   
+  React.useEffect(() => {
     setLoading(true)
     let temp_list = tokens;
     temp_list.sort(function(a, b) {
         return  parseInt(b.nft.tokenData.tokenId) - parseInt(a.nft.tokenData.tokenId);
     });
     setList(temp_list);
-    setLoading(false)
+    setLoading(tokens.length < 1)
     
     ReactDOM.render(
       <MyPaginate
@@ -90,7 +90,7 @@ export const AuctionsList = ({ tokens }: { tokens: any[] }) => {
       />,
       document.getElementById('container')
     );
-  }, [list]);
+  }, [list, tokens]);
   const indexOfLastPost = currentPage * postsPerPage;
   const indexOfFirstPost = indexOfLastPost - postsPerPage;
   const currentPosts = list.slice(indexOfFirstPost, indexOfLastPost);

@@ -4,6 +4,7 @@ import Head from "../components/head";
 import { PageWrapper } from "../styles/components";
 import { GetStaticProps } from "next";
 import { AuctionsList } from "../components/AuctionsList";
+import { useEffect, useState } from 'react';
 
 import {
   FetchStaticData,
@@ -11,7 +12,24 @@ import {
   NetworkIDs,
 } from "@zoralabs/nft-hooks";
 
-export default function Home({ tokens }: { tokens: any }) {
+export default function Home() {
+  const [tokens, setTokens] = useState([]);
+  //@ts-ignore
+  useEffect(async () => {
+    const fetchAgent = new MediaFetchAgent(
+      process.env.NEXT_PUBLIC_NETWORK_ID as NetworkIDs
+    );
+    const contractAddress = process.env
+      .NEXT_PUBLIC_TARGET_CONTRACT_ADDRESS as string;
+    const tokens_temp: any = await FetchStaticData.fetchZoraIndexerList(fetchAgent, {
+      curatorAddress: process.env.NEXT_PUBLIC_CURATORS_ID as any,
+      collectionAddresses: contractAddress ? contractAddress.split(',') : undefined,
+      limit: 10000,
+      offset: 0,
+    });
+    
+    setTokens(tokens_temp);
+  }, [])
   return (
     <IndexWrapper>
         <Head />
@@ -19,27 +37,6 @@ export default function Home({ tokens }: { tokens: any }) {
     </IndexWrapper>
   );
 }
-
-export const getStaticProps: GetStaticProps = async () => {
-  const fetchAgent = new MediaFetchAgent(
-    process.env.NEXT_PUBLIC_NETWORK_ID as NetworkIDs
-  );
-  const contractAddress = process.env
-    .NEXT_PUBLIC_TARGET_CONTRACT_ADDRESS as string;
-  const tokens = await FetchStaticData.fetchZoraIndexerList(fetchAgent, {
-    curatorAddress: process.env.NEXT_PUBLIC_CURATORS_ID as any,
-    collectionAddresses: contractAddress ? contractAddress.split(',') : undefined,
-    limit: 10000,
-    offset: 0,
-  });
-
-  return {
-    props: {
-      tokens,
-    },
-    revalidate: 60,
-  };
-};
 
 const IndexWrapper = styled(PageWrapper)`
   font-family: 'Londrina Solid', cursive;
