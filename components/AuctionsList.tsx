@@ -71,16 +71,25 @@ export const AuctionsList = ({ tokens }: { tokens: any[] }) => {
 
   React.useEffect(() => {
     setLoading(true)
-    let temp_list = tokens;
-    temp_list.sort(function(a, b) {
-        return  parseInt(b.nft.tokenData.tokenId) - parseInt(a.nft.tokenData.tokenId);
-    });
-    setList(temp_list);
+    let temp_tokens = tokens;
+    let auction_list = temp_tokens.filter((token) => token.nft.auctionData && token.nft.auctionData.status === "Active")
+    let normal_list = temp_tokens.filter((token) => !token.nft.auctionData || (token.nft.auctionData && token.nft.auctionData.status !== "Active"))
+    normal_list.sort((a, b) => parseInt(b.nft.tokenData.tokenId) - parseInt(a.nft.tokenData.tokenId));
+    auction_list.sort((a, b) => {
+      if(b.nft.auctionData.expectedEndTimestamp && a.nft.auctionData.expectedEndTimestamp)
+        return parseInt(b.nft.tokenData.tokenId) - parseInt(a.nft.tokenData.tokenId);
+      if(b.nft.auctionData.expectedEndTimestamp)
+        return 1;
+      return parseInt(b.nft.tokenData.tokenId) - parseInt(a.nft.tokenData.tokenId);
+    })
+    let results_list = auction_list.concat(normal_list);
+    setList(results_list);
+    
     setLoading(tokens.length < 1)
     
     ReactDOM.render(
       <MyPaginate
-        pageCount={list ? Math.ceil(list!.length / postsPerPage): 0}
+        pageCount={results_list ? Math.ceil(results_list!.length / postsPerPage): 0}
         pageRangeDisplayed={1}
         marginPagesDisplayed={3}
         onPageChange={paginate}
@@ -90,7 +99,7 @@ export const AuctionsList = ({ tokens }: { tokens: any[] }) => {
       />,
       document.getElementById('container')
     );
-  }, [list, tokens]);
+  }, [tokens]);
   const indexOfLastPost = currentPage * postsPerPage;
   const indexOfFirstPost = indexOfLastPost - postsPerPage;
   const currentPosts = list.slice(indexOfFirstPost, indexOfLastPost);
